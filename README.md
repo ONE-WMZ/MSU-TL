@@ -1,2 +1,1 @@
-# MSU-FS
-MSU-FS: U-Net-Driven EEG Epilepsy Detection under Mask Self-supervised and Few-shot Learning Paradigms
+# MSU-FS: U-Net-Driven EEG Epilepsy Detection under Mask Self-supervised and Few-shot Learning Paradigms
