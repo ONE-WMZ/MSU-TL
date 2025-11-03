@@ -1,6 +1,7 @@
-# MSU-FS:U-Net-Driven EEG Epilepsy Detection under Mask Self-supervised and Few-shot Learning Paradigms
+# MSU-TL: U-Net-Driven EEG Epilepsy Detection under Mask Self-supervised and Transfer Learning Paradigms
 ---
 
-Mingzhen Wen [1], Hailing Wang [2], Jinghao Liu [3], Jizhen Luo [3], Lei Meng [3] 
+Mingzhen Wen1, Hailing Wang1, *, Jinghao Liu1, Jizhen Luo1, Lei Meng1, Wei Sun2, *
+1 Shanghai University of Engineering Science, School of Electric and Electronic Engineering, Shanghai, China
+2 Institute of Software, Chinese Academy of Sciences, Beijing, China 
 
-Shanghai University of Engineering Science, School of Electric and Electronic Engineering, Shanghai, China
