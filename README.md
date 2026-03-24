@@ -1,7 +1,7 @@
 # MSU-TL: U-Net-Driven EEG Epilepsy Detection under Mask Self-supervised and Transfer Learning Paradigms
 
 ---
-Mingzhen Wen¹,  Hailing Wang¹*,  Jinghao Liu¹,  Jizhen Luo¹,  Lei Meng¹,  Wei Sun²*
+<center>Mingzhen Wen¹,  Hailing Wang¹*,  Jinghao Liu¹,  Jizhen Luo¹,  Lei Meng¹,  Wei Sun²*</center>
 
 ¹ Shanghai University of Engineering Science, School of Electric and Electronic Engineering, Shanghai, China
 
