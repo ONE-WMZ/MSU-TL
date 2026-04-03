@@ -16,4 +16,4 @@
 ![Pretrained models](https://github.com/ONE-WMZ/MSU-TL/blob/main/Picture/Pretrained%20models.png)
 
 ---
-__For other details, refer to the Code file and Picture file__
+__【Notify】For other details, refer to the Code file and Picture file__
