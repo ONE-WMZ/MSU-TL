@@ -13,4 +13,4 @@
 ![Overall Architecture](https://github.com/ONE-WMZ/MSU-TL/blob/main/Picture/Overall%20Architecture.png)
 
 ## Pretrained models
-![Pretrained models]()
+![Pretrained models](https://github.com/ONE-WMZ/MSU-TL/blob/main/Picture/Pretrained%20models.png)
