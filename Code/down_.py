@@ -2,8 +2,8 @@ import time
 import torch
 import random
 import torch.nn as nn
-from tqdm import tqdm                                                           # 进度条
-import torch.optim as optim                                                     # 优化器
+from tqdm import tqdm                                     
+import torch.optim as optim                                              
 from torch.utils.data import DataLoader
 from sklearn.metrics import accuracy_score, recall_score, precision_score, f1_score, roc_auc_score
 
