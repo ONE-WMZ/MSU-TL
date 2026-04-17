@@ -1,21 +1,11 @@
 
-from unit_ import mask_X
-from unit_ import set_seed, device
-
-from unit_ import encoder_
-from unit_ import decoder_
-from unit_ import mask_recon_X
-from unit_ import model_class
-
-from loss_ import huber_loss
-
-from dataset_ import dataset_pre
-from dataset_ import getsome_
-
-from data_get_ import users_list
-
 
 balance_size = {0: 130, 1: 50}
+
+users_list = ['chb01', 'chb02', 'chb03', 'chb04', 'chb05', 'chb06',
+              'chb07', 'chb08', 'chb09', 'chb10', 'chb11', 'chb12',
+              'chb13', 'chb14', 'chb15', 'chb16', 'chb17', 'chb18',
+              'chb19', 'chb20', 'chb21', 'chb22', 'chb23', 'chb24']
 
 
 

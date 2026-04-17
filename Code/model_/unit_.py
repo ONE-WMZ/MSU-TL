@@ -4,7 +4,7 @@ import numpy as np
 import torch.nn as nn
 import torch.nn.functional as F
 
-# %% 随机种子
+
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 def set_seed(seed=508):
@@ -15,12 +15,12 @@ def set_seed(seed=508):
     # PyTorch
     torch.manual_seed(seed)
     if torch.cuda.is_available():
-        torch.cuda.manual_seed_all(seed) 
+        torch.cuda.manual_seed_all(seed)   
         torch.backends.cudnn.deterministic = True
-        torch.backends.cudnn.benchmark = False        
+        torch.backends.cudnn.benchmark = False         
 
 
-# %% 掩码函数（对原始数据进行掩码）
+#  mask fun
 def mask_X(masked_data, mask_ratio=0.6, mask_value=0.0):
     if isinstance(masked_data, torch.Tensor):
         masked_data = masked_data.clone()
@@ -38,7 +38,7 @@ def mask_X(masked_data, mask_ratio=0.6, mask_value=0.0):
 
 
 
-# %% 分类
+#  class
 class model_class(nn.Module):
     def __init__(self, input_dim, num_classes):
         super().__init__()
@@ -63,7 +63,7 @@ class model_class(nn.Module):
         return y_
 
 
-# %% 初始化模块:通道混合（交互通道间的信息）
+#  channel init : mix
 class channel_init(nn.Module):
     def __init__(self, ch_in, ch_out):
         super().__init__()
@@ -77,48 +77,47 @@ class channel_init(nn.Module):
         return self.channel_init(x)
 
 
-# %% 多尺度模块
+#  Multi-scale module
 class multi_(nn.Module):
     def __init__(self, ch_in, ch_out):
         super().__init__()
-        # 固定随机种子
-        self.conv_size_5 = nn.Conv1d(ch_in, ch_out, kernel_size=5, padding=2)                       # 细尺度核(L)
-        self.conv_size_10 = nn.Conv1d(ch_in, ch_out, kernel_size=11, padding=5)                     # 中尺度核(L)
-        self.conv_size_20 = nn.Conv1d(ch_in, ch_out, kernel_size=21, padding=10)                    # 粗尺度核(L)
-        self.conv_hollow = nn.Conv1d(ch_in, ch_out, kernel_size=3, padding=2, dilation=2)           # 空洞卷积(L)
-        self.relu = nn.ReLU()                                                             
+        self.conv_size_5 = nn.Conv1d(ch_in, ch_out, kernel_size=5, padding=2)  
+        self.conv_size_10 = nn.Conv1d(ch_in, ch_out, kernel_size=11, padding=5)        
+        self.conv_size_20 = nn.Conv1d(ch_in, ch_out, kernel_size=21, padding=10)               
+        self.conv_hollow = nn.Conv1d(ch_in, ch_out, kernel_size=3, padding=2, dilation=2)  
+        self.relu = nn.ReLU()                                                                  
 
     def forward(self, x):
         x_5 = self.conv_size_5(x)
         x_10 = self.conv_size_10(x)
         x_20 = self.conv_size_20(x)
         x_hollow = self.conv_hollow(x)
-        centroid = (x_5 + x_10 + x_20 + x_hollow) / 4  
+        centroid = (x_5 + x_10 + x_20 + x_hollow) / 4                                            
         return self.relu(centroid)
 
 
-# %% U-Net下采样
+#  U-Net > down sampling
 class down_(nn.Module):
     def __init__(self, ch_in, ch_out, in_size, out_size, dropout=0.3):
         super().__init__()
         self.multi_ = multi_(ch_in, ch_out)
         self.downsample = nn.MaxPool1d(kernel_size=int(in_size/out_size), stride=int(in_size/out_size))
-        self.dropout = nn.Dropout(dropout)                                  
+        self.dropout = nn.Dropout(dropout)       
 
     def forward(self, x):
         x_multi = self.multi_(x)
         x_down = self.downsample(x_multi)
-        x_down = self.dropout(x_down)                                      
+        x_down = self.dropout(x_down)             
         return x_multi, x_down
 
 
-# %% 编码器：提取特征
+# Encoder
 class encoder_(nn.Module):
-    """输入：（6，400）"""
+    # input shape (16,400)
     def __init__(self, class_is_no):
         super().__init__()
-        self.class_is_no = class_is_no   
-        self.channel_init = channel_init(16, 16)  
+        self.class_is_no = class_is_no                             # isNon class
+        self.channel_init = channel_init(16, 16)                   # channel init
         self.down_1 = down_(16, 32, 400, 200)
         self.down_2 = down_(32, 64, 200, 100)
         self.down_3 = down_(64, 128, 100, 50)
@@ -126,21 +125,22 @@ class encoder_(nn.Module):
         self.down_5 = down_(256, 512, 10, 1)
 
     def forward(self, x):
-        # X.shape = (6,400)
+        # X.shape = (16,400)
         x0 = self.channel_init(x)
-        x1_skip, x1_down = self.down_1(x0)  
-        x2_skip, x2_down = self.down_2(x1_down)  
-        x3_skip, x3_down = self.down_3(x2_down) 
-        x4_skip, x4_down = self.down_4(x3_down)   
-        x5_skip, x5_down = self.down_5(x4_down)   
-        feature = x5_down.flatten(start_dim=1)                            
+        x1_skip, x1_down = self.down_1(x0)                         # 16->32
+        x2_skip, x2_down = self.down_2(x1_down)                    # 32->64
+        x3_skip, x3_down = self.down_3(x2_down)                    # 64->128
+        x4_skip, x4_down = self.down_4(x3_down)                    # 128->256
+        x5_skip, x5_down = self.down_5(x4_down)                    # 256->512
+        feature = x5_down.flatten(start_dim=1)                     # flat
+        # isnon class
         if self.class_is_no:
             return feature
         else:
             return x1_skip, x2_skip, x3_skip, x4_skip, x5_skip, x5_down, feature
 
 
-# %% 上采样
+# Up sampling
 class up_(nn.Module):
     def __init__(self, ch_in, ch_out, skip_channels, output_size, dropout=0.3):
         super().__init__()
@@ -155,7 +155,8 @@ class up_(nn.Module):
 
     def forward(self, x, skip):
         x_up = self.upsample(x)
-        x_up = self.conv_input(x_up)  
+        x_up = self.conv_input(x_up)
+
         if skip is not None:
             if x_up.shape[-1] != skip.shape[-1]:
                 skip = F.interpolate(skip, size=x_up.shape[-1], mode='linear', align_corners=True)
@@ -164,17 +165,18 @@ class up_(nn.Module):
             x = x_up
         return self.dropout(self.conv(x))
 
-# %% 解码器
+# Decoder
 class decoder_(nn.Module):
     def __init__(self, class_is_no):
         super().__init__()
         self.class_is_no = class_is_no
-        self.up_1 = up_(512, 256, 512, 10)          
-        self.up_2 = up_(256, 128, 256, 50)               
-        self.up_3 = up_(128, 64, 128, 100)               
-        self.up_4 = up_(64, 32, 64, 200)              
-        self.up_5 = up_(32, 16, 32, 400)                   
-        self.final_conv = nn.Conv1d(16, 16, kernel_size=1)   
+
+        self.up_1 = up_(512, 256, 512, 10)                      # 512, skip512 -> 256
+        self.up_2 = up_(256, 128, 256, 50)                      # 256, skip256 -> 128
+        self.up_3 = up_(128, 64, 128, 100)                      # 128, skip128 -> 64
+        self.up_4 = up_(64, 32, 64, 200)                        # 64,  skip64  -> 32
+        self.up_5 = up_(32, 16, 32, 400)                        # 32,  skip32  -> 32
+        self.final_conv = nn.Conv1d(16, 16, kernel_size=1)      # end -> 16
 
     def forward(self, all_x):
         if not self.class_is_no:
@@ -187,11 +189,10 @@ class decoder_(nn.Module):
             x_ = self.final_conv(x)
             return x_
         else:
-            print('[注]Decoder不涉及分类模块')
+            print('Decoder not class model')
             return None
 
 
-# %%
 class mask_recon_X(nn.Module):
     def __init__(self, class_is_no):
         super().__init__()
@@ -200,13 +201,11 @@ class mask_recon_X(nn.Module):
         self.decoder = decoder_(class_is_no)
 
     def forward(self, x):
-        if not self.class_is_no:                            
-            encoder_x = self.encoder(x)                       
-            decoder_x = self.decoder(encoder_x)              
+        if not self.class_is_no:                              # IsNon down class
+            encoder_x = self.encoder(x)                       # encoder: extract feature
+            decoder_x = self.decoder(encoder_x)               # decoder: Re-construct
             return encoder_x, decoder_x
         else:
-            encoder_x = self.encoder(x)                     
+            encoder_x = self.encoder(x)                       # encoder
             return encoder_x
 
-
-# %% end

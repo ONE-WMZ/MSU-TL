@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 from unit_ import process_data
 
-# %% 文件地址
+# ! file path
 root_path = "E:/CHB-MIT/chb-mit-scalp-eeg-database-1.0.0/"
 seizure_info_path = "seizure_info.csv"
 
@@ -20,23 +20,23 @@ users_list = ['chb01', 'chb02', 'chb03', 'chb04', 'chb05', 'chb06',
               'chb19', 'chb20', 'chb21', 'chb22', 'chb23', 'chb24']
 
 
-# %% 正常数据
-def generate_normal_data(list_, save_dir='../Data_', save_label_0='label_0'):
+# ! normal data
+def generate_normal_(list_, save_dir='../Data_', save_label_0='label_0'):
     for user_id in list_:
         file_path = root_path + list_[user_id]
         print(file_path)
         data = process_data(file_path)
         if data is not None:
-
+            # seg (20 minute)
             seizure_data = data[:, 0:20 * 60 * 200]
-
+            # save 
             save_path = os.path.join(save_dir, user_id, f'{save_label_0}.npy')
-            os.makedirs(os.path.dirname(save_path), exist_ok=True)  
+            os.makedirs(os.path.dirname(save_path), exist_ok=True)
             np.save(save_path, seizure_data)
-            print('--', user_id, ':处理完成.\t', seizure_data.shape)
+            print('--', user_id, ':processing finish.\t', seizure_data.shape)
 
 
-# %% 癫痫数据
+# ! seizure data
 def generate_seizure_(seizure_info_, save_dir='../Data_', save_label_1='label_1'):
     seizure_all = pd.read_csv(seizure_info_)
     for user_id in users_list:
@@ -47,26 +47,24 @@ def generate_seizure_(seizure_info_, save_dir='../Data_', save_label_1='label_1'
             file_name = root_path + str(user_id) + '/' + user_list.iloc[j]['File Name']
             start = user_list.iloc[j]['Seizure Start Time (seconds)']
             end = user_list.iloc[j]['Seizure End Time (seconds)']
-            
+            # preprocess
             data = process_data(file_name)
             if data is None:
                 continue
             else:
-
+                # seg (all)
                 seizure_data = data[:, start * 200:end * 200]
                 user_seizure_data.append(seizure_data)
-
+        # combine 
         merged_data = np.concatenate(user_seizure_data, axis=1)
-
+        # save
         save_path = os.path.join(save_dir, user_id, f'{save_label_1}.npy')
         os.makedirs(os.path.dirname(save_path), exist_ok=True)  
         np.save(save_path, merged_data)
-        print('--', user_id, ':处理完成.\t', merged_data.shape)
-
-# %% start
-
-generate_normal_data(list_ = normal_list)
-generate_seizure_(seizure_info_= seizure_info_path)
+        print('--', user_id, ':processing finish.\t', merged_data.shape)
 
 
-# %% end
+if __name__ == "__main__":
+    generate_normal_(list_ = normal_list)
+    generate_seizure_(seizure_info_= seizure_info_path)
+

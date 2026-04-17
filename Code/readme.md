@@ -17,6 +17,6 @@ Environmental requirements：
 - mne
 - pandas
 - sklearn
-- matplotlib
+- ...
 
 

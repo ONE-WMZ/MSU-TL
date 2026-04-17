@@ -6,7 +6,7 @@ from unit_ import read_len_
 from generate_ import users_list, normal_list
 
 
-# %% 选择的通道
+
 selected_channel = [
     'F7-T7', 'T7-P7',         # 左颞叶
     'F8-T8', 'T8-P8-0',       # 右颞叶
