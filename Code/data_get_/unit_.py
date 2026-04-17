@@ -22,7 +22,7 @@ def process_data(file_path):
     available_channels = raw.info['ch_names']                   # isNon channel
     missing_channels = [ch for ch in selected_channels if ch not in available_channels]
     if missing_channels:
-        print(f"文件缺少以下通道：{missing_channels}，跳过此文件。")
+        print(f"file miss some channel :{missing_channels, skip.")
         return None
     else:
         raw_copy = raw.copy().pick(selected_channels)           # copy 
