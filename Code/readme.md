@@ -1,12 +1,11 @@
 # MSU-TL:
 
 ---
-If you want to reproduce the code：
-- First, set up the environment according to the requirements ;
-- Second, run generate_.py to get data ;
-- Then, run the file pre_model_Train.py ;
-- Save the model parameters at the address: '../pt/msu-tl(pre_model).pth' ;
-- Finally, load the parameters in the test file .
+Reproduce the code：
+- 1. set up the environment according to the requirements
+- 2. run generate_.py to get data
+- 3. run the file pre_.py
+- 4. run the file down_.py
 
 ---
 Environmental requirements：
